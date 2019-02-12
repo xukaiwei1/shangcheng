@@ -1,6 +1,6 @@
 const CONFIG = require('../config.js')
 const REQUEST_CACHE = []
-const API_BASE_URL = 'https://api.it120.cc'
+const API_BASE_URL = 'http://localhost'
 /**
  * 简单请求封装
  * url: 请求地址
@@ -8,7 +8,7 @@ const API_BASE_URL = 'https://api.it120.cc'
  * method: 请求方法
  * cache: 缓存时长(单位: 秒)
  */
-function FetchRequest(url, data, method = 'GET', cache = 0, header = {}, noSubDomain = false) {
+function FetchRequest(url, data, method = 'GET', cache = 0, header = {}, noSubDomain = true) {
   var request_key = GetStorageKey(url, method);
   if (cache) {
     return new Promise(Storage);

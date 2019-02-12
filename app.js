@@ -41,43 +41,44 @@ App({
       }
     });
     //  获取商城名称
-    api.fetchRequest('/config/get-value', {
-      key: 'mallName'
+    api.fetchRequest('/mallApp/getMallconfig', {
+      mlCode: 1
     }).then(function(res) {
-      if (res.data.code == 0) {
-        wx.setStorageSync('mallName', res.data.data.value);
+      if (res.data.state == 'ok') {
+        wx.setStorageSync('mallName', res.data.mlMall.mall_name);
+        wx.setStorageSync('mallId', res.data.mlMall.id);
       }
     })
-    api.fetchRequest('/score/send/rule', {
-      code: 'goodReputation'
-    }).then(function(res) {
-      if (res.data.code == 0) {
-        that.globalData.order_reputation_score = res.data.data[0].score;
-      }
-    })
-    api.fetchRequest('/config/get-value', {
-      key: 'recharge_amount_min'
-    }).then(function(res) {
-      if (res.data.code == 0) {
-        that.globalData.recharge_amount_min = res.data.data.value;
-      }
-    })
-    // 获取砍价设置
-    api.fetchRequest('/shop/goods/kanjia/list').then(function(res) {
-      if (res.data.code == 0) {
-        that.globalData.kanjiaList = res.data.data.result;
-      }
-    })
+    // api.fetchRequest('/score/send/rule', {
+    //   code: 'goodReputation'
+    // }).then(function(res) {
+    //   if (res.data.code == 0) {
+    //     that.globalData.order_reputation_score = res.data.data[0].score;
+    //   }
+    // })
+    // api.fetchRequest('/config/get-value', {
+    //   key: 'recharge_amount_min'
+    // }).then(function(res) {
+    //   if (res.data.code == 0) {
+    //     that.globalData.recharge_amount_min = res.data.data.value;
+    //   }
+    // })
+    // 获取砍价设置 暂时不需要
+    // api.fetchRequest('/shop/goods/kanjia/list').then(function(res) {
+    //   if (res.data.code == 0) {
+    //     that.globalData.kanjiaList = res.data.data.result;
+    //   }
+    // })
     // 判断是否登录
     let token = wx.getStorageSync('token');
     if (!token) {
       that.goLoginPageTimeOut()
       return
     }
-    api.fetchRequest('/user/check-token', {
+    api.fetchRequest('/login/checkToken', {
       token: token
     }).then(function(res) {
-      if (res.data.code != 0) {
+      if (res.data.state != 'ok') {
         wx.removeStorageSync('token')
         that.goLoginPageTimeOut()
       }

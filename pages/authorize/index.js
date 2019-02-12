@@ -96,15 +96,16 @@ Page({
     }
     wx.login({
       success: function(res) {
-        api.fetchRequest('/user/wxapp/login', {
-          code: res.code
+        api.fetchRequest('/login/wxlogin', {
+          code: res.code,
+          mallId: wx.getStorageSync("mallId")
         }).then(function(res) {
-          if (res.data.code == 10000) {
-            // 去注册
-            that.registerUser();
-            return;
-          }
-          if (res.data.code != 0) {
+          // if (res.data.code == 10000) {
+          //   // 去注册
+          //   that.registerUser();
+          //   return;
+          // }
+          if (res.data.state != 'ok') {
             // 登录错误
             wx.hideLoading();
             wx.showModal({
@@ -114,8 +115,8 @@ Page({
             })
             return;
           }
-          wx.setStorageSync('token', res.data.data.token)
-          wx.setStorageSync('uid', res.data.data.uid)
+          wx.setStorageSync('token', res.data.token)
+         // wx.setStorageSync('uid', res.data.data.uid)
           // 回到原来的地方放
           app.navigateToLogin = false
           wx.navigateBack();
