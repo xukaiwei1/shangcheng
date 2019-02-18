@@ -67,10 +67,10 @@ Page({
      * 示例：
      * 调用接口封装方法
      */
-    api.fetchRequest('/banner/list', {
-      key: 'mallName'
+    api.fetchRequest('/mallApp/getMallBanner', {
+      mallId: wx.getStorageSync("mallId")
     }).then(function(res) {
-      if (res.data.code == 404) {
+      if (res.data.state !='ok' ) {
         wx.showModal({
           title: '提示',
           content: '请在后台添加 banner 轮播图片',
@@ -78,7 +78,7 @@ Page({
         })
       } else {
         that.setData({
-          banners: res.data.data
+          banners: res.data.mlBanners
         });
       }
     }).catch(function(res) {
@@ -104,8 +104,9 @@ Page({
       });
       that.getGoodsList(0);
     })
-    that.getCoupons();
-    that.getNotice();
+    that.getGoodsList(0);
+    //that.getCoupons();
+   // that.getNotice();
   },
   onPageScroll(e) {
     let scrollTop = this.data.scrollTop
@@ -121,14 +122,15 @@ Page({
     wx.showLoading({
       "mask": true
     })
-    api.fetchRequest('/shop/goods/list', {
+    api.fetchRequest('/mlGoods/list', {
       categoryId: categoryId,
       nameLike: that.data.searchInput,
+      mallId: wx.getStorageSync("mallId"),
       page: this.data.curPage,
       pageSize: this.data.pageSize
     }).then(function(res) {
       wx.hideLoading()
-      if (res.data.code == 404 || res.data.code == 700) {
+      if (res.data.state != 'ok') {
         let newData = {
           loadingMoreHidden: false
         }
@@ -142,8 +144,8 @@ Page({
       if (append) {
         goods = that.data.goods
       }
-      for (var i = 0; i < res.data.data.length; i++) {
-        goods.push(res.data.data[i]);
+      for (var i = 0; i < res.data.goodsPage.list.length; i++) {
+        goods.push(res.data.goodsPage.list[i]);
       }
       that.setData({
         loadingMoreHidden: true,

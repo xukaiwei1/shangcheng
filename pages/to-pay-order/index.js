@@ -166,12 +166,12 @@ Page({
   },
   initShippingAddress: function () {
     var that = this;
-    api.fetchRequest('/user/shipping-address/default', {
+    api.fetchRequest('/mlAddress/getDefaultAddress', {
       token: wx.getStorageSync('token')
     }).then(function (res) {
       if (res.data.code == 0) {
         that.setData({
-          curAddressData: res.data.data
+          curAddressData: res.data.mlAddress
         });
       } else {
         that.setData({

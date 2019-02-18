@@ -1,5 +1,6 @@
 var commonCityData = require('../../utils/city.js')
 const api = require('../../utils/request.js')
+const util = require('../../utils/util.js')
 //获取应用实例
 var app = getApp()
 Page({
@@ -37,6 +38,14 @@ Page({
         title: '提示',
         content: '请填写手机号码',
         showCancel:false
+      })
+      return
+    }
+    if (!util.isPoneAvailable(mobile)) {
+      wx.showModal({
+        title: '提示',
+        content: '请填写正确的号码',
+        showCancel: false
       })
       return
     }
@@ -112,6 +121,7 @@ Page({
       wx.navigateBack({})
     })
   },
+
   initCityData:function(level, obj){
     if(level == 1){
       var pinkArray = [];

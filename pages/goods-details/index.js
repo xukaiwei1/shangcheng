@@ -58,11 +58,12 @@ Page({
         });
       }
     })
-    api.fetchRequest('/shop/goods/detail', {
-      id: e.id
+    api.fetchRequest('/mlGoods/goodsDetail', {
+      id: e.id,
+      mallId: wx.getStorageSync("mallId")
     }).then(function(res) {
       var selectSizeTemp = "";
-      if (res.data.data.properties) {
+      if (res.data.mlGoods.properties) {
         for (var i = 0; i < res.data.data.properties.length; i++) {
           selectSizeTemp = selectSizeTemp + " " + res.data.data.properties[i].name;
         }
@@ -73,24 +74,24 @@ Page({
           totalScoreToPay: res.data.data.basicInfo.minScore
         });
       }
-      if (res.data.data.basicInfo.pingtuan) {
+      if (res.data.mlGoods.pingtuan) {
         that.pingtuanList(e.id)
       }
-      that.data.goodsDetail = res.data.data;
-      if (res.data.data.basicInfo.videoId) {
+      that.data.goodsDetail = res.data.mlGoods;
+      if (res.data.mlGoods.videoId) {
         that.getVideoSrc(res.data.data.basicInfo.videoId);
       }
       that.setData({
-        goodsDetail: res.data.data,
-        selectSizePrice: res.data.data.basicInfo.minPrice,
-        totalScoreToPay: res.data.data.basicInfo.minScore,
-        buyNumMax: res.data.data.basicInfo.stores,
-        buyNumber: (res.data.data.basicInfo.stores > 0) ? 1 : 0
+        goodsDetail: res.data.mlGoods,
+        selectSizePrice: res.data.mlGoods.price,
+        totalScoreToPay: res.data.mlGoods.minScore,
+        buyNumMax: res.data.mlGoods.count_selling,
+        buyNumber: (res.data.mlGoods.count_selling > 0) ? 1 : 0
       });
-      WxParse.wxParse('article', 'html', res.data.data.content, that, 5);
+      WxParse.wxParse('article', 'html', res.data.mlGoods.detail_picture, that, 5);
     })
-    this.reputation(e.id);
-    this.getKanjiaInfo(e.id);
+    //this.reputation(e.id);
+    //this.getKanjiaInfo(e.id);
   },
   goShopCar: function() {
     wx.reLaunch({
@@ -106,7 +107,7 @@ Page({
   tobuy: function() {
     this.setData({
       shopType: "tobuy",
-      selectSizePrice: this.data.goodsDetail.basicInfo.minPrice
+      selectSizePrice: this.data.goodsDetail.price
     });
     this.bindGuiGeTap();
   },
@@ -385,9 +386,9 @@ Page({
    */
   buliduBuyNowInfo: function(shoptype) {
     var shopCarMap = {};
-    shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
-    shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
-    shopCarMap.name = this.data.goodsDetail.basicInfo.name;
+    shopCarMap.goodsId = this.data.goodsDetail.id;
+    shopCarMap.pic = this.data.goodsDetail.pic;
+    shopCarMap.name = this.data.goodsDetail.goods_name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
     shopCarMap.propertyChildIds = this.data.propertyChildIds;
     shopCarMap.label = this.data.propertyChildNames;
@@ -399,9 +400,9 @@ Page({
     shopCarMap.left = "";
     shopCarMap.active = true;
     shopCarMap.number = this.data.buyNumber;
-    shopCarMap.logisticsType = this.data.goodsDetail.basicInfo.logisticsId;
+    shopCarMap.logisticsType = this.data.goodsDetail.logisticsId;
     shopCarMap.logistics = this.data.goodsDetail.logistics;
-    shopCarMap.weight = this.data.goodsDetail.basicInfo.weight;
+    shopCarMap.weight = this.data.goodsDetail.weight;
 
     var buyNowInfo = {};
     if (!buyNowInfo.shopNum) {
