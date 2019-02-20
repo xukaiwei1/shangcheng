@@ -87,20 +87,24 @@ Page({
         icon: 'none'
       })
     })
-    api.fetchRequest('/shop/goods/category/all').then(function(res) {
+    api.fetchRequest('/mallApp/getGoodsType', {
+      mallId: wx.getStorageSync("mallId")
+    }).then(function(res) {
       var categories = [{
         id: 0,
         name: "全部"
       }];
-      if (res.data.code == 0) {
-        for (var i = 0; i < res.data.data.length; i++) {
-          categories.push(res.data.data[i]);
+      if (res.data.state == 'ok') {
+        for (var i = 0; i < res.data.mlGoodsTypes.length; i++) {
+          console.log(res.data.mlGoodsTypes[i])
+          categories.push({
+            id: res.data.mlGoodsTypes[i].id,
+            name: res.data.mlGoodsTypes[i].type_name
+          });
         }
       }
       that.setData({
-        categories: categories,
-        activeCategoryId: 0,
-        curPage: 1
+        categories: categories
       });
       that.getGoodsList(0);
     })
