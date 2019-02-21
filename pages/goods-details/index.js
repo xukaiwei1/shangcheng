@@ -64,14 +64,15 @@ Page({
     }).then(function(res) {
       var selectSizeTemp = "";
       if (res.data.mlGoods.properties) {
-        for (var i = 0; i < res.data.data.properties.length; i++) {
-          selectSizeTemp = selectSizeTemp + " " + res.data.data.properties[i].name;
+        for (var i = 0; i < res.data.mlGoods.properties.length; i++) {
+          selectSizeTemp = selectSizeTemp + " " + res.data.mlGoods.properties[i].name;
         }
         that.setData({
           hasMoreSelect: true,
           selectSize: that.data.selectSize + selectSizeTemp,
-          selectSizePrice: res.data.data.basicInfo.minPrice,
-          totalScoreToPay: res.data.data.basicInfo.minScore
+          // selectSizePrice: res.data.data.basicInfo.minPrice,
+          selectSizePrice: res.data.mlGoods.price,
+          // totalScoreToPay: res.data.data.basicInfo.minScore
         });
       }
       if (res.data.mlGoods.pingtuan) {
@@ -163,6 +164,7 @@ Page({
    */
   labelItemTap: function(e) {
     var that = this;
+   
     /*
     console.log(e)
     console.log(e.currentTarget.dataset.propertyid)
@@ -171,7 +173,33 @@ Page({
     console.log(e.currentTarget.dataset.propertychildname)
     */
     // 取消该分类下的子栏目所有的选中状态
-    var childs = that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods;
+    var properties = that.data.goodsDetail.properties;
+    for (var i = 0; i < properties.length; i++) {
+      that.data.goodsDetail.properties[i].active = false;
+    }
+    // 设置当前选中状态
+    that.data.goodsDetail.properties[e.currentTarget.dataset.propertyid].active = true;
+    // 获取所有的选中规格尺寸数据
+    var needSelectNum = that.data.goodsDetail.properties.length;
+    var curSelectNum = 0;
+    var propertyName ="";
+    var propertyId = "";
+    var propertyAmount = "";
+    for (var i = 0; i < that.data.goodsDetail.properties.length; i++) {
+      properties = that.data.goodsDetail.properties[i]
+      if (properties.active){
+        curSelectNum++;
+        propertyName = properties.name;
+        propertyId = properties.id;
+        propertyAmount = properties.amount;
+      }
+    }
+    var canSubmit = false;
+    if (curSelectNum >0) {
+      canSubmit = true;
+    }
+    /*
+     var childs = that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods;
     for (var i = 0; i < childs.length; i++) {
       that.data.goodsDetail.properties[e.currentTarget.dataset.propertyindex].childsCurGoods[i].active = false;
     }
@@ -196,7 +224,7 @@ Page({
     if (needSelectNum == curSelectNum) {
       canSubmit = true;
     }
-    // 计算当前价格
+     // 计算当前价格
     if (canSubmit) {
       api.fetchRequest('/shop/goods/price', {
         goodsId: that.data.goodsDetail.basicInfo.id,
@@ -213,7 +241,23 @@ Page({
       })
     }
 
-
+     */
+    // 计算当前价格
+    if (canSubmit) {
+      api.fetchRequest('/mlGoods/goodsDetail', { 
+        id: this.data.goodsDetail.id,
+        mallId: wx.getStorageSync("mallId")
+      }).then(function (res) {
+        that.setData({
+          selectSizePrice: res.data.mlGoods.price,
+          // totalScoreToPay: res.data.mlGoods.count,
+          propertyId: propertyId,
+          propertyName: propertyName,
+          buyNumMax: propertyAmount,
+          buyNumber: (propertyAmount > 0) ? 1 : 0
+        });
+      })
+    }
     this.setData({
       goodsDetail: that.data.goodsDetail,
       canSubmit: canSubmit
@@ -223,7 +267,9 @@ Page({
    * 加入购物车
    */
   addShopCar: function() {
+
     if (this.data.goodsDetail.properties && !this.data.canSubmit) {
+
       if (!this.data.canSubmit) {
         wx.showModal({
           title: '提示',
@@ -340,20 +386,20 @@ Page({
   bulidShopCarInfo: function() {
     // 加入购物车
     var shopCarMap = {};
-    shopCarMap.goodsId = this.data.goodsDetail.basicInfo.id;
-    shopCarMap.pic = this.data.goodsDetail.basicInfo.pic;
-    shopCarMap.name = this.data.goodsDetail.basicInfo.name;
+    shopCarMap.goodsId = this.data.goodsDetail.id;
+    shopCarMap.pic = this.data.goodsDetail.detail_picture;
+    shopCarMap.name = this.data.goodsDetail.goods_name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
-    shopCarMap.propertyChildIds = this.data.propertyChildIds;
-    shopCarMap.label = this.data.propertyChildNames;
+    // shopCarMap.propertyChildIds = this.data.propertyChildIds;
+    shopCarMap.label = this.data.propertyName;
     shopCarMap.price = this.data.selectSizePrice;
     shopCarMap.score = this.data.totalScoreToPay;
     shopCarMap.left = "";
     shopCarMap.active = true;
     shopCarMap.number = this.data.buyNumber;
-    shopCarMap.logisticsType = this.data.goodsDetail.basicInfo.logisticsId;
-    shopCarMap.logistics = this.data.goodsDetail.logistics;
-    shopCarMap.weight = this.data.goodsDetail.basicInfo.weight;
+    // shopCarMap.logisticsType = this.data.goodsDetail.basicInfo.logisticsId;
+    // shopCarMap.logistics = this.data.goodsDetail.logistics;
+    // shopCarMap.weight = this.data.goodsDetail.basicInfo.weight;
 
     var shopCarInfo = this.data.shopCarInfo;
     if (!shopCarInfo.shopNum) {
@@ -387,22 +433,23 @@ Page({
   buliduBuyNowInfo: function(shoptype) {
     var shopCarMap = {};
     shopCarMap.goodsId = this.data.goodsDetail.id;
-    shopCarMap.pic = this.data.goodsDetail.pic;
+    shopCarMap.pic = this.data.goodsDetail.detail_picture;
     shopCarMap.name = this.data.goodsDetail.goods_name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
-    shopCarMap.propertyChildIds = this.data.propertyChildIds;
-    shopCarMap.label = this.data.propertyChildNames;
+    // shopCarMap.propertyChildIds = this.data.propertyChildIds;
+    // shopCarMap.label = this.data.propertyChildNames;
+    shopCarMap.label = this.data.propertyName;
     shopCarMap.price = this.data.selectSizePrice;
-    if (shoptype == 'toPingtuan') {
-      shopCarMap.price = this.data.goodsDetail.basicInfo.pingtuanPrice;
-    }
+    // if (shoptype == 'toPingtuan') {
+    //   shopCarMap.price = this.data.goodsDetail.basicInfo.pingtuanPrice;
+    // }
     shopCarMap.score = this.data.totalScoreToPay;
     shopCarMap.left = "";
     shopCarMap.active = true;
     shopCarMap.number = this.data.buyNumber;
     shopCarMap.logisticsType = this.data.goodsDetail.logisticsId;
     shopCarMap.logistics = this.data.goodsDetail.logistics;
-    shopCarMap.weight = this.data.goodsDetail.weight;
+    // shopCarMap.weight = this.data.goodsDetail.weight;
 
     var buyNowInfo = {};
     if (!buyNowInfo.shopNum) {
@@ -426,9 +473,8 @@ Page({
         } else {
           toBuyInfo.shopList.push(shopCarMap);
         }*/
-
     buyNowInfo.shopList.push(shopCarMap);
-    buyNowInfo.kjId = this.data.kjId;
+    // buyNowInfo.kjId = this.data.kjId;
     return buyNowInfo;
   },
   onShareAppMessage: function() {

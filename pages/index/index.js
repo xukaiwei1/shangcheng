@@ -96,7 +96,6 @@ Page({
       }];
       if (res.data.state == 'ok') {
         for (var i = 0; i < res.data.mlGoodsTypes.length; i++) {
-          console.log(res.data.mlGoodsTypes[i])
           categories.push({
             id: res.data.mlGoodsTypes[i].id,
             name: res.data.mlGoodsTypes[i].type_name
