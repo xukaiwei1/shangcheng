@@ -26,7 +26,7 @@ Page({
     //立即购买下单
     if ("buyNow"==that.data.orderType){
       var buyNowInfoMem = wx.getStorageSync('buyNowInfo');
-      // that.data.kjId = buyNowInfoMem.kjId;
+       that.data.kjId = buyNowInfoMem.kjId;
       if (buyNowInfoMem && buyNowInfoMem.shopList) {
         shopList = buyNowInfoMem.shopList
       }
@@ -111,7 +111,7 @@ Page({
     if (!e) {
       postData.calculate = "true";
     }
-    console.log("postData" + postData.toString)
+    //console.log("postData" + postData.toString)
     api.fetchRequest('/order/create', postData, 'POST', 0, {
       'content-type': 'application/x-www-form-urlencoded'
     }).then(function (res) {
@@ -169,17 +169,17 @@ Page({
     api.fetchRequest('/mlAddress/getDefaultAddress', {
       token: wx.getStorageSync('token')
     }).then(function (res) {
-      if (res.data.code == 0) {
+      if (res.data.state == 'ok') {
         that.setData({
           curAddressData: res.data.mlAddress
         });
       } else {
         that.setData({
-          curAddressData: 1
+          curAddressData: null
         });
       }
       // 先把运费注释掉
-      // that.processYunfei();
+       that.processYunfei();
     })
   },
   processYunfei: function () {

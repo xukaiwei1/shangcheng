@@ -15,11 +15,7 @@ function formatNumber(n) {
   n = n.toString()
   return n[1] ? n : '0' + n
 }
-
-module.exports = {
-  formatTime: formatTime
-}
-function isPoneAvailable (str) {
+function isPoneAvailable(str) {
   var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
   if (!myreg.test(str)) {
     return false;
@@ -27,3 +23,7 @@ function isPoneAvailable (str) {
     return true;
   }
 }
+module.exports = {
+  formatTime: formatTime
+}
+

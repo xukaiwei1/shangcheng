@@ -41,7 +41,7 @@ Page({
       })
       return
     }
-    if (!util.isPoneAvailable(mobile)) {
+    if (!this.isPoneAvailable(mobile)) {
       wx.showModal({
         title: '提示',
         content: '请填写正确的号码',
@@ -88,31 +88,31 @@ Page({
       })
       return
     }
-    var apiAddoRuPDATE = "add";
+    var apiAddoRuPDATE = "addAddress";
     var apiAddid = that.data.id;
     if (apiAddid) {
       apiAddoRuPDATE = "update";
     } else {
       apiAddid = 0;
     }
-    api.fetchRequest(`/user/shipping-address/${apiAddoRuPDATE}`, {
+    api.fetchRequest(`/mlAddress/${apiAddoRuPDATE}`, {
       token: wx.getStorageSync('token'),
       id: apiAddid,
       provinceId: commonCityData.cityData[this.data.selProvinceIndex].id,
       cityId: cityId,
       districtId: districtId,
-      linkMan: linkMan,
-      address: address,
-      mobile: mobile,
-      code: code,
-      isDefault: 'true'
+      name: linkMan,
+      receiveAddress: address,
+      telphone: mobile,
+      zipcode: code,
+      isDefault: 0
     }).then(function (res) {
-      if (res.data.code != 0) {
+      if (res.data.errorMsg!=null&&res.data.errorMsg != '') {
         // 登录错误 
         wx.hideLoading();
         wx.showModal({
           title: '失败',
-          content: res.data.msg,
+          content: res.data.errorMsg,
           showCancel: false
         })
         return;
@@ -121,7 +121,14 @@ Page({
       wx.navigateBack({})
     })
   },
-
+  isPoneAvailable:function (str) {
+    var myreg = /^[1][3,4,5,7,8][0-9]{9}$/;
+    if(!myreg.test(str)) {
+  return false;
+} else {
+  return true;
+}
+},
   initCityData:function(level, obj){
     if(level == 1){
       var pinkArray = [];

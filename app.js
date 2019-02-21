@@ -47,6 +47,8 @@ App({
       if (res.data.state == 'ok') {
         wx.setStorageSync('mallName', res.data.mlMall.mall_name);
         wx.setStorageSync('mallId', res.data.mlMall.id);
+        wx.setStorageSync('yunPrice', res.data.mlMall.yunPrice);
+        
       }
     })
     // api.fetchRequest('/score/send/rule', {
