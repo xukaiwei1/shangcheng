@@ -1,8 +1,8 @@
 <view class="container">
     <view class="status-box">
-        <view bindtap="statusTap" class="status-label {{index == currentType ? 'active' : ''}}" wx:for-items="{{statusType}}" wx:key="{{index}}" data-index="{{index}}">
-            {{item}}
-            <view class="{{tabClass[index]}}"></view>
+        <view bindtap="statusTap" class="status-label {{item.value == currentType ? 'active' : ''}}" wx:for-items="{{statusType}}" wx:key="{{index}}" data-index="{{item.value}}">
+            {{item.name}}
+            <!-- <view class="{{tabClass[index]}}"></view> -->
         </view>
     </view>
     <view class="no-order" hidden="{{orderList ? true : false}}">
@@ -12,25 +12,25 @@
     <view class="order-list" hidden="{{orderList ? false : true}}">
         <view class="a-order" wx:for-items="{{orderList}}" wx:key="{{index}}">
             <view class="order-date">
-                <view class="date-box">下单时间：{{item.dateAdd}}</view>
-                <view class="status {{(item.status==-1 || item.status==4) ? '':'red'}}">{{item.statusStr}}</view>
+                <view class="date-box">下单时间：{{item.order_time}}</view>
+                <view class="status {{(item.status==1 || item.status==2|| item.status==3|| item.status==6) ? '':'red'}}">{{item.statusStr}}</view>
             </view>
             <view class="goods-info" bindtap="orderDetail" data-id="{{item.id}}">
                 <view class="goods-des">
-                   <view>订单号:{{item.orderNumber}} </view>
+                   <view>订单号:{{item.order_code}} </view>
                    <view wx:if="{{item.remark && item.remark != ''}}">备注： {{item.remark}}</view>
                 </view>
             </view>
-            <view >
+            <!-- <view >
                 <scroll-view class="goods-img-container" scroll-x="true">
                     <view class="img-box" wx:for-items="{{goodsMap[item.id]}}" wx:key="{{index}}">
                         <image src="{{item.pic}}" class="goods-img"></image>
                     </view>
                 </scroll-view>
-            </view>
+            </view> -->
             <view class="price-box">
-                <view class="total-price" wx:if="{{item.score <= 0}}">合计：¥ {{item.amountReal}}</view>
-                <view class="total-price" wx:if="{{item.score > 0}}">合计：¥ {{item.amountReal}} + {{item.score}} 积分</view>
+                <view class="total-price" wx:if="{{item.amount > 0}}">合计：¥ {{item.amount}}</view>
+                <!-- <view class="total-price" wx:if="{{item.score > 0}}">合计：¥ {{item.amount}}</view> -->
                 <view class="btn cancel-btn" hidden="{{item.status==0? false : true}}" bindtap="cancelOrderTap"  data-id="{{item.id}}">取消订单</view>
                 <view class="btn topay-btn" hidden="{{item.status==0? false : true}}" bindtap="toPayTap" data-id="{{item.id}}" data-money="{{item.amountReal}}" data-score="{{item.score}}">马上付款</view>        
             </view>  

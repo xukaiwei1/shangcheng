@@ -185,6 +185,7 @@ Page({
     var propertyName ="";
     var propertyId = "";
     var propertyAmount = "";
+    var selectSizePrice=0;
     for (var i = 0; i < that.data.goodsDetail.properties.length; i++) {
       properties = that.data.goodsDetail.properties[i]
       if (properties.active){
@@ -192,6 +193,7 @@ Page({
         propertyName = properties.name;
         propertyId = properties.id;
         propertyAmount = properties.amount;
+        selectSizePrice = properties.perPrice;
       }
     }
     var canSubmit = false;
@@ -244,19 +246,28 @@ Page({
      */
     // 计算当前价格
     if (canSubmit) {
-      api.fetchRequest('/mlGoods/goodsDetail', { 
-        id: this.data.goodsDetail.id,
-        mallId: wx.getStorageSync("mallId")
-      }).then(function (res) {
-        that.setData({
-          selectSizePrice: res.data.mlGoods.price,
-          // totalScoreToPay: res.data.mlGoods.count,
-          propertyId: propertyId,
-          propertyName: propertyName,
-          buyNumMax: propertyAmount,
-          buyNumber: (propertyAmount > 0) ? 1 : 0
-        });
-      })
+      // api.fetchRequest('/mlGoods/goodsDetail', { 
+      //   id: this.data.goodsDetail.id,
+      //   mallId: wx.getStorageSync("mallId")
+      // }).then(function (res) {
+      //   that.setData({
+      //     selectSizePrice: selectSizePrice,
+      //     // totalScoreToPay: res.data.mlGoods.count,
+      //     propertyId: propertyId,
+      //     propertyName: propertyName,
+      //     buyNumMax: propertyAmount,
+      //     buyNumber: (propertyAmount > 0) ? 1 : 0
+      //   });
+      // })
+
+      that.setData({
+        selectSizePrice: selectSizePrice,
+        // totalScoreToPay: res.data.mlGoods.count,
+        propertyId: propertyId,
+        propertyName: propertyName,
+        buyNumMax: propertyAmount,
+        buyNumber: (propertyAmount > 0) ? 1 : 0
+      });
     }
     this.setData({
       goodsDetail: that.data.goodsDetail,
@@ -390,7 +401,7 @@ Page({
     shopCarMap.pic = this.data.goodsDetail.detail_picture;
     shopCarMap.name = this.data.goodsDetail.goods_name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
-    // shopCarMap.propertyChildIds = this.data.propertyChildIds;
+    shopCarMap.propertyId = this.data.propertyId;
     shopCarMap.label = this.data.propertyName;
     shopCarMap.price = this.data.selectSizePrice;
     shopCarMap.score = this.data.totalScoreToPay;
@@ -411,7 +422,7 @@ Page({
     var hasSameGoodsIndex = -1;
     for (var i = 0; i < shopCarInfo.shopList.length; i++) {
       var tmpShopCarMap = shopCarInfo.shopList[i];
-      if (tmpShopCarMap.goodsId == shopCarMap.goodsId && tmpShopCarMap.propertyChildIds == shopCarMap.propertyChildIds) {
+      if (tmpShopCarMap.goodsId == shopCarMap.goodsId && tmpShopCarMap.propertyId == shopCarMap.propertyId) {
         hasSameGoodsIndex = i;
         shopCarMap.number = shopCarMap.number + tmpShopCarMap.number;
         break;
@@ -436,7 +447,7 @@ Page({
     shopCarMap.pic = this.data.goodsDetail.detail_picture;
     shopCarMap.name = this.data.goodsDetail.goods_name;
     // shopCarMap.label=this.data.goodsDetail.basicInfo.id; 规格尺寸 
-    // shopCarMap.propertyChildIds = this.data.propertyChildIds;
+    shopCarMap.propertyId = this.data.propertyId;
     // shopCarMap.label = this.data.propertyChildNames;
     shopCarMap.label = this.data.propertyName;
     shopCarMap.price = this.data.selectSizePrice;

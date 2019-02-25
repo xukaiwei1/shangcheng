@@ -3,7 +3,7 @@ const api = require('../../utils/request.js')
 var app = getApp()
 Page({
   data: {
-    statusType: ["待付款", "待发货", "待收货", "待评价", "已完成"],
+    statusType: [{name:"待付款",value:0}, {name:"待发货",value:1}, {name:"待收货",value:4}, {name:"待评价",value:5}, {name:"已完成",value:6}],
     currentType: 0,
     tabClass: ["", "", "", "", ""]
   },
@@ -49,41 +49,42 @@ Page({
     var orderId = e.currentTarget.dataset.id;
     var money = e.currentTarget.dataset.money;
     var needScore = e.currentTarget.dataset.score;
-    api.fetchRequest('/user/amount', {
-      token: wx.getStorageSync('token'),
-    }).then(function(res) {
-      if (res.data.code == 0) {
-        // res.data.data.balance
-        money = money - res.data.data.balance;
-        if (res.data.data.score < needScore) {
-          wx.showModal({
-            title: '错误',
-            content: '您的积分不足，无法支付',
-            showCancel: false
-          })
-          return;
-        }
-        if (money <= 0) {
-          // 直接使用余额支付
-          api.fetchRequest('/order/pay', {
-            token: wx.getStorageSync('token'),
-            orderId: orderId
-          }, 'POST', 0, {
-            'content-type': 'application/x-www-form-urlencoded'
-          }).then(function(res) {
-            that.onShow();
-          })
-        } else {
-          wxpay.wxpay(app, money, orderId, "/pages/order-list/index");
-        }
-      } else {
-        wx.showModal({
-          title: '错误',
-          content: '无法获取用户资金信息',
-          showCancel: false
-        })
-      }
-    })
+    wxpay.wxpay(app, money, orderId, "/pages/order-list/index");
+    // api.fetchRequest('/user/amount', {
+    //   token: wx.getStorageSync('token'),
+    // }).then(function(res) {
+    //   if (res.data.code == 0) {
+    //     // res.data.data.balance
+    //     money = money - res.data.data.balance;
+    //     if (res.data.data.score < needScore) {
+    //       wx.showModal({
+    //         title: '错误',
+    //         content: '您的积分不足，无法支付',
+    //         showCancel: false
+    //       })
+    //       return;
+    //     }
+    //     if (money <= 0) {
+    //       // 直接使用余额支付
+    //       api.fetchRequest('/order/pay', {
+    //         token: wx.getStorageSync('token'),
+    //         orderId: orderId
+    //       }, 'POST', 0, {
+    //         'content-type': 'application/x-www-form-urlencoded'
+    //       }).then(function(res) {
+    //         that.onShow();
+    //       })
+    //     } else {
+    //       wxpay.wxpay(app, money, orderId, "/pages/order-list/index");
+    //     }
+    //   } else {
+    //     wx.showModal({
+    //       title: '错误',
+    //       content: '无法获取用户资金信息',
+    //       showCancel: false
+    //     })
+    //   }
+    // })
   },
   onLoad: function(options) {
     // 生命周期函数--监听页面加载
@@ -142,13 +143,13 @@ Page({
       token: wx.getStorageSync('token')
     };
     postData.status = that.data.currentType;
-    this.getOrderStatistics();
-    api.fetchRequest('/order/list', postData).then(function(res) {
-      if (res.data.code == 0) {
+    //this.getOrderStatistics();
+    api.fetchRequest('/mlOrder/list', postData).then(function(res) {
+      if (res.data.state == 'ok') {
         that.setData({
-          orderList: res.data.data.orderList,
-          logisticsMap: res.data.data.logisticsMap,
-          goodsMap: res.data.data.goodsMap
+          orderList: res.data.orderList,
+          logisticsMap: res.data.logisticsMap,
+          goodsMap: res.data.goodsMap
         });
       } else {
         that.setData({

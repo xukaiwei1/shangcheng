@@ -22,9 +22,9 @@ Page({
         version: CONFIG.version
       })
     }
-    this.getUserApiInfo();
-    this.getUserAmount();
-    this.checkScoreSign();
+    //this.getUserApiInfo();
+    //this.getUserAmount();
+   // this.checkScoreSign();
   },
   aboutUs : function () {
     wx.showModal({

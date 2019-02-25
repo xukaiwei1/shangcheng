@@ -6,21 +6,21 @@ function wxpay(app, money, orderId, redirectUrl) {
     remark = "支付订单 ：" + orderId;
     nextAction = { type: 0, id: orderId };
   }
-  api.fetchRequest('/pay/wx/wxapp', {
+  api.fetchRequest('/mlOrder/pay', {
     token: wx.getStorageSync('token'),
     money: money,
     remark: remark,
     payName: "在线支付",
     nextAction: nextAction
   }).then(function (res) {
-    if (res.data.code == 0) {
+    if (res.data.state == 'ok') {
       // 发起支付
       wx.requestPayment({
-        timeStamp: res.data.data.timeStamp,
-        nonceStr: res.data.data.nonceStr,
-        package: 'prepay_id=' + res.data.data.prepayId,
+        timeStamp: res.data.mlPay.timeStamp,
+        nonceStr: res.data.mlPay.nonceStr,
+        package:  res.data.mlPay.package,
         signType: 'MD5',
-        paySign: res.data.data.sign,
+        paySign: res.data.mlPay.paySign,
         fail: function (aaa) {
           wx.showToast({ title: '支付失败:' + aaa })
         },
