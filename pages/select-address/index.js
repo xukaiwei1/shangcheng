@@ -9,10 +9,10 @@ Page({
 
   selectTap: function(e) {
     var id = e.currentTarget.dataset.id;
-    api.fetchRequest('/user/shipping-address/update', {
+    api.fetchRequest('/mlAddress/updateAddress', {
       token: wx.getStorageSync('token'),
       id: id,
-      isDefault: 'true'
+      isDefault: 0
     }).then(function(res) {
       wx.navigateBack({})
     })
@@ -40,12 +40,12 @@ Page({
   },
   initShippingAddress: function() {
     var that = this;
-    api.fetchRequest('/user/shipping-address/list', {
+    api.fetchRequest('/mlAddress/getAddressList', {
       token: wx.getStorageSync('token')
-    }).then(function(res) {
-      if (res.data.code == 0) {
+    }).then(function (res) {
+      if (res.data.state == 'ok') {
         that.setData({
-          addressList: res.data.data
+          addressList: res.data.mlAddressList
         });
       } else if (res.data.code == 700) {
         that.setData({

@@ -91,7 +91,7 @@ Page({
     var apiAddoRuPDATE = "addAddress";
     var apiAddid = that.data.id;
     if (apiAddid) {
-      apiAddoRuPDATE = "update";
+      apiAddoRuPDATE = "updateAddress";
     } else {
       apiAddid = 0;
     }
@@ -197,19 +197,19 @@ Page({
     if (id) {
       // 初始化原数据
       wx.showLoading();
-      api.fetchRequest('/user/shipping-address/detail', {
+      api.fetchRequest('/mlAddress/getAddressById', {
         token: wx.getStorageSync('token'),
         id: id
       }).then(function (res) {
-        if (res.data.code == 0) {
+        if (res.data.state == 'ok') {
           that.setData({
             id: id,
-            addressData: res.data.data,
-            selProvince: res.data.data.provinceStr,
-            selCity: res.data.data.cityStr,
-            selDistrict: res.data.data.areaStr
+            addressData: res.data.mlAddress,
+            selProvince: res.data.mlAddress.provinceStr,
+            selCity: res.data.mlAddress.cityStr,
+            selDistrict: res.data.mlAddress.areaStr
           });
-          that.setDBSaveAddressId(res.data.data);
+          that.setDBSaveAddressId(res.data.mlAddress);
           return;
         } else {
           wx.showModal({
@@ -252,7 +252,7 @@ Page({
       content: '确定要删除该收货地址吗？',
       success: function (res) {
         if (res.confirm) {
-          api.fetchRequest('/user/shipping-address/delete', {
+          api.fetchRequest('/mlAddress/deleteAddressById', {
             token: wx.getStorageSync('token'),
             id: id
           }).then(function (res) {
